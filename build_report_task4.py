@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""生成《钱欣羽+Task4.pdf》项目总结报告：正文五号、1.5倍行距、两端对齐；
-改用 Microsoft YaHei 字体以解决中英数混排间隔异常问题。"""
+"""生成《钱欣羽+Task4.pdf》项目总结报告：正文宋体（SimSun）五号 10.5pt、1.5倍行距、两端对齐；
+通过 wordWrap='CJK' + 空格伸缩参数解决宋体中英数混排间隔异常问题；标题用黑体。"""
 import os, re, html
 from reportlab.lib import colors, units
 from reportlab.lib.pagesizes import A4
@@ -13,8 +13,8 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 FONT_ROOT = r"C:\Windows\Fonts"
-pdfmetrics.registerFont(TTFont("YaHei", os.path.join(FONT_ROOT, "msyh.ttc")))
-pdfmetrics.registerFont(TTFont("YaHeiBold", os.path.join(FONT_ROOT, "msyhbd.ttc")))
+pdfmetrics.registerFont(TTFont("SimSun", os.path.join(FONT_ROOT, "simsun.ttc")))
+pdfmetrics.registerFont(TTFont("SimHei", os.path.join(FONT_ROOT, "simhei.ttf")))
 
 ROOT = r"C:\Users\qianx\Desktop\task4"
 IMG = os.path.join(ROOT, "report_imgs")
@@ -22,18 +22,19 @@ OUT = os.path.join(ROOT, "钱欣羽+Task4.pdf")
 
 styles = getSampleStyleSheet()
 def S(name, **kw):
-    base = dict(fontName="YaHei", fontSize=10.5, leading=15.75, alignment=TA_JUSTIFY,
-                firstLineIndent=21, spaceAfter=0, spaceBefore=0, wordWrap='CJK')
+    base = dict(fontName="SimSun", fontSize=10.5, leading=15.75, alignment=TA_JUSTIFY,
+                firstLineIndent=21, spaceAfter=0, spaceBefore=0, wordWrap='CJK',
+                spaceShrinkage=0.3, spaceStretch=0.6)
     base.update(kw)
     return ParagraphStyle(name, **base)
 
 body   = S("Body")
 noind  = S("NoInd", firstLineIndent=0)
-h1     = S("H1", fontName="YaHeiBold", fontSize=14, leading=21, spaceBefore=10, spaceAfter=6, firstLineIndent=0)
-h2     = S("H2", fontName="YaHeiBold", fontSize=11, leading=16.5, spaceBefore=8, spaceAfter=4, firstLineIndent=0)
-title  = S("Title", fontName="YaHeiBold", fontSize=18, leading=27, alignment=TA_CENTER, spaceAfter=8, firstLineIndent=0)
-sub    = S("Sub", fontName="YaHei", fontSize=11, leading=16, alignment=TA_CENTER, spaceAfter=0, firstLineIndent=0)
-cap    = S("Cap", fontName="YaHei", fontSize=9, leading=13.5, alignment=TA_CENTER, spaceBefore=4, spaceAfter=8, firstLineIndent=0)
+h1     = S("H1", fontName="SimHei", fontSize=14, leading=21, spaceBefore=10, spaceAfter=6, firstLineIndent=0)
+h2     = S("H2", fontName="SimHei", fontSize=11, leading=16.5, spaceBefore=8, spaceAfter=4, firstLineIndent=0)
+title  = S("Title", fontName="SimHei", fontSize=18, leading=27, alignment=TA_CENTER, spaceAfter=8, firstLineIndent=0)
+sub    = S("Sub", fontName="SimSun", fontSize=11, leading=16, alignment=TA_CENTER, spaceAfter=0, firstLineIndent=0)
+cap    = S("Cap", fontName="SimSun", fontSize=9, leading=13.5, alignment=TA_CENTER, spaceBefore=4, spaceAfter=8, firstLineIndent=0)
 li     = S("Li", firstLineIndent=0, leftIndent=21, spaceAfter=2)
 
 def esc(t): return html.escape(t)
@@ -76,17 +77,17 @@ story.append(P("图表由 Python（pandas + plotly）在本地生成数据并序
 story.append(PageBreak())
 story.append(H1("四、核心图表与数据洞察"))
 story.append(P("以下 6 张图覆盖单变量分布、分组对比、双变量关联与高级可视化，每张均配编号、标题与文字解读。"))
-story.append(fig_block("图1", "播放量分布（log10 分箱）",
+story.append(fig_block("图1", "播放量分布直方图（log10 分箱）",
     "多数视频集中在较低播放量区间，少数头部视频极高，呈典型右偏长尾。log10 分箱能更清晰地展现长尾结构。",
     "chart1.png"))
 story.append(fig_block("图2", "六大分区播放量分布对比",
-    "各分区中位数接近，但“其他”分区仅 5 条样本、不宜下结论；各分区均存在上方离群点（爆款）。点击图例可隐藏/显示某一分区。",
+    "各分区播放量中位数与离散程度存在明显差异，动画/二次元及“其他”分区相对较高；但“其他”仅有 5 条样本，不能作为稳健结论。各分区均存在上方离群点（爆款）。看板中点击图上方图例可隐藏/显示某一分区。",
     "chart2.png"))
 story.append(fig_block("图3", "核心变量相关系数热力图",
     "播放量与点赞数(r=0.86)、收藏数(r=0.70)强正相关；视频时长与播放量几乎无关(r≈-0.01)。解释播放量差异最应关注点赞与收藏。",
     "chart3.png"))
 story.append(fig_block("图4", "播放量 vs 点赞数（双对数 + 回归线）",
-    "双对数下散点沿红色回归线分布，二者共变关系稳健。二者为同期累计数据，只能说明共变，不能推断因果。可用下拉框按分区筛选。",
+    "双对数下散点沿红色回归线分布，二者共变关系稳健。二者为同期累计数据，只能说明共变，不能推断因果。看板中可通过下拉框筛选不同分区的视频散点，红色趋势线代表全样本整体回归关系。",
     "chart4.png"))
 story.append(fig_block("图5", "不同发布时段播放量中位数",
     "早/中/晚中位数接近（约 80–100 万），差异有限；凌晨柱虽高但样本量 n=2，结论不可靠，已用柱顶标注提示。",
@@ -98,7 +99,7 @@ story.append(fig_block("图6", "标题长度与平均播放量关系",
 story.append(PageBreak())
 story.append(H1("五、技术踩坑记录"))
 pitfalls = [
-    "中文乱码与混排间隔：图表与 PDF 中文显示为方块，且 SimSun 对英文/数字字距处理不佳。解决——图表用 SimHei、正文改用 Microsoft YaHei，保证中英数混排紧凑自然。",
+    "中文乱码与混排间隔：图表中文显示为方块，PDF 宋体正文在两端对齐时中英数混排间隔被拉宽。解决——图表用 SimHei；PDF 保持宋体正文，启用 CJK 逐字换行并收紧空格伸缩参数，混排即恢复紧凑。",
     "单文件离线化：Plotly 默认引用 CDN，断网打开空白。解决——将完整 plotly.min.js 内联进 HTML，文件虽增至约 4.4 MB，但真正实现“任意浏览器直接打开”。",
     "样本量陷阱：周末仅 4 条、凌晨仅 2 条、分区“其他”仅 5 条。若直接对这些分组下结论会误导，故在图表与报告中显式标注样本量，并声明“仅作方法示意”。",
     "相关性≠因果：播放量与点赞数强相关，但二者是同期累计数据。初稿曾写成“点赞带动播放”，经审查改为“共变关系”，避免因果误判。",
