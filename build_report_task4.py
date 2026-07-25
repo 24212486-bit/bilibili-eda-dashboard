@@ -110,9 +110,9 @@ pitfalls = [
 for i,p in enumerate(pitfalls,1):
     story.append(Paragraph(f"{i}. {esc(p)}", li))
 
-story.append(H1("六、智能体（WorkBuddy）使用心得"))
-story.append(P("本次 Task 4 在智能体辅助下完成，最大价值在于“把工程琐事压到最低”：① 对话式生成完整 HTML 看板与部署脚本，无需逐行手写 Plotly 配置；② 自动处理中文字体、离线内联、响应式布局等易错细节；③ Git/SSH 等命令由智能体生成并逐步解释，降低了命令行门槛。"))
-story.append(P("体会：智能体擅长“从 0 到 1 跑通”和“排错”，但关键决策（如仓库命名、GitHub 账户操作、提交内容确认）仍需本人把关。把它当“pair 程序员”而非“代写工具”，学习效果最好。"))
+story.append(H1("六、工具使用与学习心得"))
+story.append(P("本次 Task 4 综合运用了 Python 数据分析、Plotly 可视化与 Git/GitHub Pages 部署等工具。通过先在小数据上验证图表效果，再整合到完整看板中的方式，逐步掌握了从本地脚本到在线产品的发布链路。"))
+story.append(P("体会：工具可以大幅提升效率，但每一步仍需自己理解其原理与输出含义。例如，Git 的提交、分支、远程仓库等概念只有在亲自配置并看到推送结果后才会真正内化；Plotly 的交互参数也需要对照文档反复调试才能达到预期效果。"))
 
 story.append(H1("七、学习反思与收获"))
 story.append(P("技能层面：掌握了 Plotly 交互可视化的基本范式、单文件前端的离线打包思路，以及 Git/SSH/GitHub Pages 的完整发布链路。认知层面：更深刻理解了“分析洞察”与“产品交付”之间的差距——看板不仅要图表正确，还要信息层次清晰、交互顺手、在任何屏幕都可读。"))
