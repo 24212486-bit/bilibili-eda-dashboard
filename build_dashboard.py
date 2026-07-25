@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """生成 Task4 单文件交互式看板 index.html（内联 Plotly.js，离线可直接打开）。"""
 import os, json
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
-ROOT = r"C:\Users\qianx\Desktop\task4"
-SRC  = r"C:\Users\qianx\Desktop\task3\clean_Task1_data.csv"
-PLOTLY_JS = r"C:\Users\qianx\Desktop\task4\plotly.min.js"   # 已下载的离线库
-OUT  = os.path.join(ROOT, "index.html")
+# 相对路径：脚本与数据同目录，克隆仓库后可直接运行
+ROOT = Path(__file__).resolve().parent
+SRC  = ROOT / "clean_Task1_data.csv"
+PLOTLY_JS = ROOT / "plotly.min.js"   # 已下载的离线库
+OUT  = ROOT / "index.html"
 
 df = pd.read_csv(SRC)
 n = len(df)
@@ -54,8 +56,9 @@ fig2 = go.Figure(boxes)
 fig2.update_layout(
     title="图2 六大分区播放量分布对比（点击图例可隐藏/筛选分区）",
     yaxis_title="播放量", xaxis_title="分区大类",
-    yaxis_type="log", showlegend=False,
-    margin=dict(l=50,r=20,t=50,b=50), paper_bgcolor="white", plot_bgcolor="#fafafa")
+    yaxis_type="log", showlegend=True,
+    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+    margin=dict(l=50,r=20,t=80,b=50), paper_bgcolor="white", plot_bgcolor="#fafafa")
 
 # ============ 图3：变量相关性热力图 ============
 num_cols = ["播放量","点赞数","收藏数","弹幕数","投币数","评论数","分享数","视频时长(秒)","标题长度"]
@@ -84,7 +87,7 @@ fig4.add_trace(go.Scatter(
     name="视频",
     hovertemplate="播放量: %{x:,}<br>点赞数: %{y:,}<extra></extra>"))
 fig4.add_trace(go.Scatter(
-    x=np.expm1(xs), y=np.expm1(ys), mode="lines", name="回归趋势线",
+    x=np.expm1(xs), y=np.expm1(ys), mode="lines", name="全样本回归趋势线",
     line=dict(color="#E74C3C", width=3)))
 fig4.update_layout(
     title="图4 播放量 vs 点赞数（双对数 + 回归线，可用下拉筛选分区）",
@@ -123,14 +126,14 @@ fig6.update_layout(
 
 # ============ 组装 HTML ============
 chart_defs = [
-    ("chart1", fig1.to_plotly_json(), "图1 播放量分布组合图",
+    ("chart1", fig1.to_plotly_json(), "图1 播放量分布直方图",
      "多数视频集中在较低播放量区间，少数头部视频极高，呈典型右偏长尾。点击上方按钮可在“对数/线性”坐标轴间切换，对数视图能更清楚地看清长尾结构。"),
     ("chart2", fig2.to_plotly_json(), "图2 六大分区播放量对比",
-     "各分区中位数接近，但“其他”分区仅 5 条样本、不宜下结论；各分区均存在上方离群点（爆款）。点击图例可隐藏/显示某一分区，实现维度筛选。"),
+     "各分区播放量中位数与离散程度存在明显差异，动画/二次元及“其他”分区相对较高；但“其他”仅有 5 条样本，不能作为稳健结论。各分区均存在上方离群点（爆款）。点击图上方图例可隐藏/显示某一分区，实现维度筛选。"),
     ("chart3", fig3.to_plotly_json(), "图3 变量相关性热力图",
      "播放量与点赞数(r=0.86)、收藏数(r=0.70)强正相关；视频时长与播放量几乎无关(r≈-0.01)。想解释播放量差异，最该关注点赞与收藏。"),
     ("chart4", fig4.to_plotly_json(), "图4 播放量 vs 点赞数 散点",
-     "双对数下散点沿红色回归线分布，二者共变关系稳健。二者为同期累计数据，只能说明共变，不能推断因果。可用下拉框按分区筛选观察。"),
+     "双对数下散点沿红色回归线分布，二者共变关系稳健。二者为同期累计数据，只能说明共变，不能推断因果。可通过下拉框筛选不同分区的视频散点，红色趋势线代表全样本整体回归关系。"),
     ("chart5", fig5.to_plotly_json(), "图5 发布时段中位数",
      "早/中/晚中位数接近（约 80–100 万），差异有限；凌晨柱虽高但样本量 n=2，结论不可靠，已用柱顶标注提示。"),
     ("chart6", fig6.to_plotly_json(), "图6 标题长度 vs 平均播放量",
@@ -181,7 +184,8 @@ controls_js = r'''
     if (v !== '__all__') idx = idx.filter(i => raw.part[i] === v);
     const fx = idx.map(i=>raw.play[i]);
     const fy = idx.map(i=>raw.like[i]);
-    Plotly.restyle('chart4', {x:[fx], y:[fy]});
+    // 只更新第0个图层（散点），第1个图层（全样本回归趋势线）保持不变
+    Plotly.restyle('chart4', {x:[fx], y:[fy]}, [0]);
   });
 '''.replace("__SCATTER_RAW__", json.dumps(scatter_raw))
 

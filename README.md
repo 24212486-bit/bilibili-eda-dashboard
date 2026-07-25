@@ -13,7 +13,7 @@
   1. 播放量分布（对数/线性切换）
   2. 六大分区播放量对比（点击图例筛选）
   3. 变量相关性热力图
-  4. 播放量 vs 点赞数 散点 + 回归（按分区筛选）
+  4. 播放量 vs 点赞数 散点 + 回归（下拉框筛选分区散点，红色趋势线为全样本整体回归关系）
   5. 发布时段播放量中位数（标注样本量）
   6. 标题长度 vs 平均播放量
 - 关键数据洞察 + 面向 Task 4 的可验证假设。
@@ -21,14 +21,17 @@
 ## 本地预览
 直接双击 `index.html`，或用浏览器打开 `file:///.../task4/index.html`。
 
-## 部署到 GitHub Pages（需在 GitHub 网页端手动完成）
-1. 登录 GitHub，新建仓库（如 `bilibili-eda-dashboard`）。
-2. 在 **Settings → SSH and GPG keys** 添加本机公钥（`id_ed25519.pub` 内容）。
-3. 本地执行：
+## 在线访问（已部署）
+本项目已通过 GitHub Pages 部署上线：
+
+**https://24212486-bit.github.io/bilibili-eda-dashboard/**
+
+## 部署方式（记录）
+1. GitHub 新建仓库 `bilibili-eda-dashboard`，Settings → SSH and GPG keys 添加本机公钥。
+2. 本地执行：
    ```bash
-   git remote add origin git@github.com:<你的用户名>/<仓库名>.git
+   git remote add origin git@github.com:24212486-bit/bilibili-eda-dashboard.git
    git branch -M main
    git push -u origin main
    ```
-4. 仓库 **Settings → Pages**，Source 选择 `main` 分支 `/ (root)`，保存。
-5. 等待 2–5 分钟，访问 `https://<你的用户名>.github.io/<仓库名>/`。
+3. 仓库 **Settings → Pages**，Source 选择 `main` 分支 `/ (root)`，保存，等待 2–5 分钟生效。
