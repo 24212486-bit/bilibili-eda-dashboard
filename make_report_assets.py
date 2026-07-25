@@ -25,8 +25,15 @@ f1 = go.Figure(go.Histogram(
 ))
 f1.update_layout(
     title="图1 播放量分布（log10 分箱）",
-    xaxis_title="log10(播放量)",
+    xaxis_title="播放量（对数刻度）",
     yaxis_title="视频数量",
+    xaxis=dict(
+        tickmode="array",
+        tickvals=[0, 1, 2, 3, 4, 5, 6],
+        ticktext=["1", "10", "100", "1k", "10k", "100k", "1M"],
+        gridcolor="#e0e0e0"
+    ),
+    yaxis=dict(gridcolor="#e0e0e0"),
     bargap=0.15,
     margin=dict(l=50, r=20, t=50, b=50),
     paper_bgcolor="white",
@@ -38,7 +45,9 @@ parts = ["知识/资讯","娱乐","游戏","动画/二次元","生活","其他"]
 f2 = go.Figure([go.Box(y=df.loc[df["分区大类"]==p,"播放量"], name=p,
                         marker_color=PALETTE[i%len(PALETTE)], boxmean=True) for i,p in enumerate(parts)])
 f2.update_layout(title="图2 六大分区播放量分布对比", yaxis_title="播放量", xaxis_title="分区大类",
-                yaxis_type="log", showlegend=False, margin=dict(l=50,r=20,t=50,b=50), paper_bgcolor="white", plot_bgcolor="#fafafa")
+                yaxis_type="log", showlegend=True,
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+                margin=dict(l=50,r=20,t=80,b=50), paper_bgcolor="white", plot_bgcolor="#fafafa")
 
 # 图3
 num_cols = ["播放量","点赞数","收藏数","弹幕数","投币数","评论数","分享数","视频时长(秒)","标题长度"]
@@ -53,7 +62,7 @@ b,a = np.polyfit(lp, ll, 1); xs = np.linspace(lp.min(), lp.max(), 50); ys = a + 
 f4 = go.Figure()
 f4.add_trace(go.Scatter(x=df["播放量"], y=df["点赞数"], mode="markers",
                         marker=dict(size=8, color=df["播放量"], colorscale="Viridis", opacity=0.8), name="视频"))
-f4.add_trace(go.Scatter(x=np.expm1(xs), y=np.expm1(ys), mode="lines", name="回归趋势线", line=dict(color="#E74C3C", width=3)))
+f4.add_trace(go.Scatter(x=np.expm1(xs), y=np.expm1(ys), mode="lines", name="全样本回归趋势线", line=dict(color="#E74C3C", width=3)))
 f4.update_layout(title="图4 播放量 vs 点赞数（双对数 + 回归线）", xaxis_title="播放量", yaxis_title="点赞数",
                  xaxis_type="log", yaxis_type="log", margin=dict(l=60,r=20,t=50,b=50), paper_bgcolor="white", plot_bgcolor="#fafafa")
 

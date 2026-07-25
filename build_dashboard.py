@@ -37,13 +37,24 @@ ACCENT = "#FB7299"   # B站粉
 PALETTE = ["#FB7299","#23ADE5","#FFB023","#7ED321","#9B59B6","#E74C3C"]
 
 # ============ 图1：播放量分布直方图（可切换 对数/线性）============
+# 用 log10(播放量) 生成直方图，避免 Plotly 在对数 x 轴上 bin 被压扁导致柱子消失
+log_play = np.log10(df["播放量"].values)
 fig1 = go.Figure(go.Histogram(
-    x=df["播放量"], nbinsx=45, marker_color=ACCENT, opacity=0.85,
-    hovertemplate="播放量区间: %{x}<br>视频数: %{y}<extra></extra>"))
+    x=log_play, nbinsx=25, marker_color=ACCENT, opacity=0.9,
+    marker_line_color="#333333", marker_line_width=1.2,
+    hovertemplate="log10(播放量)区间: %{x}<br>视频数: %{y}<extra></extra>"))
 fig1.update_layout(
     title="图1 播放量分布（默认对数坐标轴）",
-    xaxis_title="播放量", yaxis_title="视频数量",
-    xaxis_type="log",
+    xaxis_title="播放量（对数刻度）", yaxis_title="视频数量",
+    # 用 tickvals/ticktext 把线性 log10 轴显示成常用的 10^n 标签
+    xaxis=dict(
+        tickmode="array",
+        tickvals=[0, 1, 2, 3, 4, 5, 6],
+        ticktext=["1", "10", "100", "1k", "10k", "100k", "1M"],
+        gridcolor="#e0e0e0"
+    ),
+    yaxis=dict(gridcolor="#e0e0e0"),
+    bargap=0.15,
     margin=dict(l=50,r=20,t=50,b=50), paper_bgcolor="white", plot_bgcolor="#fafafa")
 fig1.update_traces(name="播放量")
 
@@ -127,7 +138,7 @@ fig6.update_layout(
 # ============ 组装 HTML ============
 chart_defs = [
     ("chart1", fig1.to_plotly_json(), "图1 播放量分布直方图",
-     "多数视频集中在较低播放量区间，少数头部视频极高，呈典型右偏长尾。点击上方按钮可在“对数/线性”坐标轴间切换，对数视图能更清楚地看清长尾结构。"),
+     "多数视频集中在较低播放量区间，少数头部视频极高，呈典型右偏长尾。横轴采用 log10(播放量) 对数刻度，能更清楚地看清长尾结构。"),
     ("chart2", fig2.to_plotly_json(), "图2 六大分区播放量对比",
      "各分区播放量中位数与离散程度存在明显差异，动画/二次元及“其他”分区相对较高；但“其他”仅有 5 条样本，不能作为稳健结论。各分区均存在上方离群点（爆款）。点击图上方图例可隐藏/显示某一分区，实现维度筛选。"),
     ("chart3", fig3.to_plotly_json(), "图3 变量相关性热力图",
@@ -155,10 +166,9 @@ for cid, spec, title, interp in chart_defs:
     </section>'''
     charts_js += f"Plotly.newPlot('{cid}', {json.dumps(spec['data'])}, {json.dumps(spec['layout'])}, CONFIG);\n"
 
-# 图1 对数/线性 切换按钮 + 图4 分区筛选下拉
+# 图4 分区筛选下拉
 controls_html = '''
     <div class="controls">
-      <button id="btnLog" class="btn">切换 对数/线性 坐标轴（图1）</button>
       <label class="sel-label">图4 按分区筛选：
         <select id="selPart" class="sel">
           <option value="__all__">全部</option>
@@ -167,12 +177,6 @@ controls_html = '''
     </div>'''
 
 controls_js = r'''
-  // 图1 坐标轴切换
-  let histLog = true;
-  document.getElementById('btnLog').addEventListener('click', () => {
-    histLog = !histLog;
-    Plotly.relayout('chart1', {'xaxis.type': histLog ? 'log' : 'linear'});
-  });
   // 图4 分区下拉
   const raw = __SCATTER_RAW__;
   const parts = Array.from(new Set(raw.part));

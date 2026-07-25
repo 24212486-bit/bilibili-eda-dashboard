@@ -72,13 +72,13 @@ story.append(P("指标卡选取逻辑：样本量(120)与字段数(18)交代数�
 
 story.append(H1("三、技术实现方案"))
 story.append(P("使用 Plotly.js 作为交互图表库。为满足“单个 HTML 文件、所有 CSS/JS 内嵌、任意浏览器直接打开”的要求，将完整的 Plotly.js（约 4.5 MB）直接内联进 HTML 的 <script> 标签，使文件离线可用，同时天然适配 GitHub Pages 的在线访问。"))
-story.append(P("图表由 Python（pandas + plotly）在本地生成数据并序列化为 Plotly 的 data/layout JSON，再在页面中通过 Plotly.newPlot 渲染。交互功能覆盖：悬停显示精确数值、框选缩放、图例点击筛选分区、坐标轴“对数/线性”一键切换、以及“按分区筛选”下拉框。看板数据已内联，不依赖外部接口。"))
+story.append(P("图表由 Python（pandas + plotly）在本地生成数据并序列化为 Plotly 的 data/layout JSON，再在页面中通过 Plotly.newPlot 渲染。交互功能覆盖：悬停显示精确数值、框选缩放、图例点击筛选分区、以及“按分区筛选”下拉框。看板数据已内联，不依赖外部接口。"))
 
 story.append(PageBreak())
 story.append(H1("四、核心图表与数据洞察"))
 story.append(P("以下 6 张图覆盖单变量分布、分组对比、双变量关联与高级可视化，每张均配编号、标题与文字解读。"))
 story.append(fig_block("图1", "播放量分布直方图（log10 分箱）",
-    "多数视频集中在较低播放量区间，少数头部视频极高，呈典型右偏长尾。log10 分箱能更清晰地展现长尾结构。",
+    "多数视频集中在较低播放量区间，少数头部视频极高，呈典型右偏长尾。横轴采用 log10(播放量) 对数刻度，能更清楚地看清长尾结构。",
     "chart1.png"))
 story.append(fig_block("图2", "六大分区播放量分布对比",
     "各分区播放量中位数与离散程度存在明显差异，动画/二次元及“其他”分区相对较高；但“其他”仅有 5 条样本，不能作为稳健结论。各分区均存在上方离群点（爆款）。看板中点击图上方图例可隐藏/显示某一分区。",
